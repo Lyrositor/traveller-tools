@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% from "_macros.html" import missions_accordion %}
+
+{% block extra_scripts %}
+  <script type="module" src="index.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>Mission Board</h2>
+  <ul class="nav nav-pills mb-3 justify-content-center" id="missions-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="missions-ongoing-tab" data-bs-toggle="pill" data-bs-target="#missions-ongoing" type="button" role="tab" aria-controls="missions-ongoing" aria-selected="true">Ongoing</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="missions-new-tab" data-bs-toggle="pill" data-bs-target="#missions-new" type="button" role="tab" aria-controls="missions-new" aria-selected="false">New</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="missions-completed-tab" data-bs-toggle="pill" data-bs-target="#missions-completed" type="button" role="tab" aria-controls="missions-completed" aria-selected="false">Completed</button>
+    </li>
+  </ul>
+  <div class="tab-content" id="missions-content">
+    <div class="tab-pane fade show active" id="missions-ongoing" role="tabpanel" aria-labelledby="missions-ongoing-tab" tabindex="0">
+      {% if missions_ongoing %}
+        <p>The following missions are underway:</p>
+        {{ missions_accordion("ongoing", missions_ongoing) }}
+      {% else %}
+        <p><em>There are no ongoing missions.</em></p>
+      {% endif %}
+    </div>
+    <div class="tab-pane fade" id="missions-new" role="tabpanel" aria-labelledby="missions-new-tab" tabindex="0">
+      {% if missions_new %}
+        <p>The following missions are available:</p>
+        {{ missions_accordion("new", missions_new) }}
+      {% else %}
+        <p><em>There are no available missions.</em></p>
+      {% endif %}
+    </div>
+    <div class="tab-pane fade" id="missions-completed" role="tabpanel" aria-labelledby="missions-completed-tab" tabindex="0">
+      {% if missions_completed %}
+        <p>The following missions have been completed:</p>
+        {{ missions_accordion("completed", missions_completed) }}
+      {% else %}
+        <p><em>There are no completed missions yet.</em></p>
+      {% endif %}
+    </div>
+  </div>
+
+  <h2>Map</h2>
+  <p>Hover over the hex coordinates (the XXYY numbers at the top) to see more information about that system's main world.</p>
+  {% for hex in hexes %}
+  <div class="hex-info card" id="hex-{{ hex.coords }}">
+    <div class="card-body">
+      <h5 class="card-title">{{ hex.uwp_extended }}</h5>
+      <p class="card-text">
+        <strong>Starport Quality:</strong> {{ hex.starport_label }}<br />
+        <strong>Size:</strong> {{ hex.size_label }}<br />
+        <strong>Atmosphere:</strong> {{ hex.atmosphere_label }}<br />
+        <strong>Hydrographics:</strong> {{ hex.hydrographics_label }}<br />
+        <strong>Population:</strong> {{ hex.population_label }}<br />
+        <strong>Government:</strong> {{ hex.government_label }}<br />
+        <strong>Law:</strong> {{ hex.law_label }}<br />
+        <strong>Tech:</strong> {{ hex.tech_label }}<br />
+        <strong>Bases:</strong> {% if hex.bases %}{{ hex.base_label }}{% else %}<em>None</em>{% endif %}<br />
+        <strong>Trade Codes:</strong> {{ hex.trade_codes_label }}<br />
+      </p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="text-center mb-3">
+  {{ svg|safe }}
+</div>
+<div class="container">
+  <h2>Tools</h2>
+  <p>The following tools are available to help you with the campaign:</p>
+  <ul>
+    <li><a href="new_port_checklist.html">New Port Checklist</a>: an assisted checklist of all steps to take when arriving at a new starport.</li>
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{%- macro missions_accordion(group, missions) -%}
+<div class="accordion" id="accordion-missions-{{ group }}">
+  {% for mission in missions %}
+  <div class="accordion-item">
+    <h3 class="accordion-header" id="accordion-missions-{{ group }}-{{ loop.index }}-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accordion-missions-{{ group }}-{{ loop.index }}-collapse" aria-expanded="false" aria-controls="accordion-missions-{{ group }}-{{ loop.index }}-collapse">
+        {{ mission.name }}
+      </button>
+    </h3>
+    <div id="accordion-missions-{{ group }}-{{ loop.index }}-collapse" class="accordion-collapse collapse" aria-labelledby="accordion-missions-{{ group }}-{{ loop.index }}-header">
+      <div class="accordion-body">
+        {{ mission.intro|safe }}
+        {% if mission.log %}
+          <h5>Mission Log</h5>
+          {% for log in mission.log %}
+            <div class="row"><div class="col-2">{{ log.date }}</div><div class="col-10">{{ log.entry }}</div></div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{%- endmacro -%}
+
+{%- macro world_select(label, model, hexes) -%}
+  <div class="col-12">
+    <div class="input-group">
+      <div class="input-group-text">{{ label }}</div>
+      <select class="form-select" v-model="{{ model }}">
+        <option disabled selected>Choose a world</option>
+        {% for hex in hexes %}
+          {% if hex.name != "???" %}
+            <option value="{{ hex.coords }}">{{ hex.name }} ({{ hex.coords }})</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+{%- endmacro -%}
+
+{%- macro field_number(label, model, min=None, max=None) -%}
+  <div class="col-12">
+    <div class="input-group">
+      <div class="input-group-text">{{ label }}</div>
+      <input type="number" class="form-control" {% if min is not none %}min="{{ min }}"{% endif %} {% if max is not none %}max="{{ max }}"{% endif %} v-model="{{ model }}" />
+    </div>
+  </div>
+{%- endmacro -%}
+
+{%- macro field_select(label, model, options) -%}
+  <div class="col-12">
+    <div class="input-group">
+      <div class="input-group-text">{{ label }}</div>
+      <select class="form-select" v-model="{{ model }}">
+        {% for key, value in options.items() %}
+          <option value="{{ key }}">{{ value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+{%- endmacro -%}
+
+{%- macro field_checkbox(label, model) -%}
+  <div class="col-12">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" v-model="{{ model }}" />
+      <label class="form-check-label">{{ label }}</label>
+    </div>
+  </div>
+{%- endmacro -%}
+
+{%- macro roll(model, suffix="") -%}
+  <div class="col-12">
+    <div class="roll"><code v-html="{{ model }}">Loading...</code>{% if suffix %} {{ suffix }}{% endif %}</div>
+  </div>
+{%- endmacro -%}

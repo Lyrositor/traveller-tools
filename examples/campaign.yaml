@@ -1,0 +1,30 @@
+# An example campaign file for use in building a website
+name: "Of Foobar and Spam"
+start_date: 501-41-6
+current_date: 501-41-6
+ship_name: Inbox
+map_subsector: K
+missions:
+  - name: Prime Directive
+    status: ongoing
+    intro: Spread spam throughout the galaxy.
+    log:
+      - date: 501-41-6
+        entry: Picked up a shipment of spam, ready for delivery.
+
+sector_name: The Foobar Sector
+sector_density_dm: 0
+subsectors: {}
+routes: []
+borders: []
+allegiances:
+  Sp: Spamworld
+map:
+  "1821":
+    name: Spamworld
+    tech: 15
+    government: 10
+    population: 10
+    trade_codes: [Ht]
+    allegiance: Sp
+    zone: R

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "traveller-tools"
+version = "0.1.0"
+description = ""
+authors = ["Lyrositor <gagne.marc@gmail.com>"]
+license = "CC0"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyYAML = "6.0"
+requests = "2.28.0"
+Jinja2 = "3.1.2"
+pydantic = "1.9.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

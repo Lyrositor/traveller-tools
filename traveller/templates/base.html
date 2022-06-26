@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta property="og:title" content="{{ campaign_name }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:description" content="The adventures of the {{ ship_name }} and its trusty crew." />
+  <meta name="theme-color" content="#096390" />
+
+  <title>{% block title %}{{ campaign_name }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Nunito:ital,wght@0,400;0,700;1,400;1,700&family=Staatliches&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <link rel="stylesheet" href="main.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script type="module" src="common.js"></script>
+  {% block extra_scripts %}{% endblock %}
+</head>
+<body id="app">
+<div class="container">
+  <h1><a href="index.html">{{ campaign_name }}</a></h1>
+  <p class="text-center">This campaign chronicles the adventures of the <strong>{{ ship_name }}</strong> and its trusty crew.</p>
+  <p class="text-center">It is {% if week == 0 %}<strong>New Year's Day</strong> of the <strong>year {{ year }}</strong>{% else %}<strong>day {{ day }}</strong> of <strong>week {{ week }}</strong> of <strong>year {{ year }}</strong>{% endif %} ({{ date }}).</p>
+</div>
+{% block content %}
+{% endblock %}
+</body>
+</html>

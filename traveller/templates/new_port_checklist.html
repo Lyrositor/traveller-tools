@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% from "_macros.html" import field_checkbox, field_number, field_select, roll, world_select %}
+
+{% block title %}New Port Checklist - {{ campaign_name }}{% endblock %}
+
+{% block extra_scripts %}
+  <script type="module" src="new_port_checklist.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<h2>New Port Checklist</h2>
+<p>When the crew has just arrived in a new port, the following routine checklist should be followed.</p>
+{{ world_select("Choose a world", "newPort.world", hexes) }}
+
+<h3 class="mt-3">1. Landing</h3>
+<p>Not all ships and crews are made equal when it comes to landing at a starport.</p>
+<p><strong>Streamlined</strong> ships have no penalty entering a planet's atmosphere. <strong>Partially streamlined</strong> ships allows for entering <code>3-</code> atmospheres without penalty, and other atmosphere with a <code>DM-2</code> penalty to Pilot (DEX/INT) checks. Unstreamlined ships have a penalty of <code>DM-4</code> for entering any atmosphere and must repeat this check every minute; a failed check inflicts <code>1D</code> damage, ignoring armor.</p>
+<p>Landing at a starport can be done in <code>1D</code> seconds with a Routine <code>6+</code> Pilot (DEX/INT) check, or <code>1D</code> minutes for a <code>DM+2</code> bonus. Landing in the wild can be more difficult.</p>
+<p><strong>Note:</strong> If landing at a highport, leave the ship type to "Streamlined" in the calculator.</p>
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("DEX or INT", "newPort.landing.characteristic", -3, 3) }}
+  {{ field_number("Pilot", "newPort.landing.pilot", -3, 4) }}
+  {{ field_select("Ship", "newPort.landing.ship", {"streamlined": "Streamlined", "partially-streamlined": "Partially Streamlined", "unstreamlined": "Unstreamlined"}) }}
+  {{ field_checkbox("Go Fast", "newPort.landing.speed") }}
+  {{ roll("newPortLandingRoll", "(Routine 6+)") }}
+</div>
+
+<h3 class="mt-3">2. Prepare to Disembark</h3>
+<p>Many worlds have a hostile atmosphere, one way or another - poisonous air, overzealous security, micrometeor showers... The list goes on. Before any Traveller steps out of their ship, they should be prepared for what awaits them on the other side of the airlock.</p>
+<p><strong>Gravity:</strong> both high gravity worlds (size <code>10+</code> typically) and low gravity worlds (size <code>6-</code> typically) impose a <code>DM-1</code> penalty to all checks until <code>1D</code> weeks have passed (or <code>1D</code> days with the Athletics skill).</p>
+<p><strong>Extreme Weather:</strong> extreme weather, like very strong winds and torrential downpours, impose a <code>DM-1</code> penalty to all checks.</p>
+
+<h3 class="mt-3">3. Submit to Inspection</h3>
+<p>Most lawful planetary starports will conduct a routine check of passengers when they arrive. A <code>2D</code> check is rolled against the planet's law level; on a lower or equal result, the Travellers are investigated and their ship is searched.</p>
+{{ roll("newPortInspectionRoll", '<span v-if="newPortHexInfo">(<span v-html="newPortHexInfo.law+1"></span>+)</span>') }}
+
+<h3 class="mt-3">4. Deliver Passengers and Freight</h3>
+
+<p>The crew may deliver any passengers or freight they are transporting. See <span class="page">p.239</span> for prices.</p>
+
+<p>Mail can also be delivered for a flat reward of Cr25000 per transported container for that world.</p>
+
+<p>If freight (including mail) is late (to be defined by the GM), the following penalty is deducted from the sale price:</p>
+
+<div class="roll"><code>!roll 1d6+4 !Cargo late fee</code> x 10%</div>
+
+<h3 class="mt-3">5. Sell Goods</h3>
+
+<p>Speculative goods can be sold to a buyer or broker.</p>
+
+<h4 class="mt-3">5.1. Find a Buyer or a Broker</h4>
+
+<p>You can either attempt to find a buyer or a broker. The latter serves as an intermediary who will negotiate on your behalf in exchange for a cut of the proceeds (see <span class="page">p.241</span>). If you are on a technologically-advanced world, you can perform the search through online networks.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12"><strong>Find a Buyer or Broker (in person):</strong></div>
+  {{ field_number("EDU or SOC", "newPort.sellGoods.brokerCharacteristic", -3, 3) }}
+  {{ field_number("Broker", "newPort.sellGoods.broker", -3, 4) }}
+  {{ field_number("Previous Attempts this Month", "newPort.sellGoods.previousAttempts", 0) }}
+  {{ roll("newPortSellGoodsFindBuyerInPersonRoll", "(Average 8+), which takes <code>!roll 1d6 !Time for finding buyer/broker</code> days") }}
+</div>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12"><strong>Find a Buyer or Broker (online, TL8+ only):</strong></div>
+  {{ field_number("EDU", "newPort.sellGoods.brokerCharacteristic", -3, 3) }}
+  {{ field_number("Admin", "newPort.sellGoods.admin", -3, 4) }}
+  {{ field_number("Previous Attempts this Month", "newPort.sellGoods.previousAttempts", 0) }}
+  {{ roll("newPortSellGoodsFindBuyerOnlineRoll", "(Average 8+), which takes <code>!roll 1d6 !Time for finding buyer/broker</code> hours") }}
+</div>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12"><strong>Find a Black Market Buyer or Broker of Illegal Goods:</strong></div>
+  {{ field_number("EDU or SOC", "newPort.sellGoods.brokerCharacteristic", -3, 3) }}
+  {{ field_number("Streetwise", "newPort.sellGoods.streetwise", -3, 4) }}
+  {{ field_number("Previous Attempts this Month", "newPort.sellGoods.previousAttempts", 0) }}
+  {{ roll("newPortSellGoodsFindBuyerIllegalRoll", "(Average 8+), which takes <code>!roll 1d6 !Time for finding buyer/broker</code> days") }}
+</div>
+
+<p>If the crew already previously located a buyer, and they are still on the station, it is not necessary to roll to find them again.</p>
+
+<h4 class="mt-3">5.2. Determine sale price</h4>
+
+<p>Once the crew has found a buyer, they'll need to negotiate a price for what they're selling. This is done by rolling <code>3D</code> Broker (INT or EDU) and applying relevant DMs (see <span class="page">p.243</span>).</p>
+<p>If employing a local broker, add an extra <code>+2</code> on top of their broker skill (determined with a <code>2D/3</code> roll).</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("INT or SOC", "newPort.sellGoods.negotiationCharacteristic", -3, 3) }}
+  {{ field_number("Broker", "newPort.sellGoods.broker", -3, 6) }}
+  <div class="col-12">
+    <div class="input-group">
+      <div class="input-group-text">Trade Good</div>
+      <select class="form-select" v-model="newPort.sellGoods.tradeGood">
+        <option v-for="good in tradeGoods" :value="good.id" v-html="good.name"></option>
+      </select>
+    </div>
+  </div>
+  {{ field_number("Opposing Broker", "newPort.sellGoods.opposingBroker", -3, 4) }}
+  {{ roll("newPortSellGoodsNegotiationRoll") }}
+</div>
+
+<p>If the resultant price is refused, it is not possible to deal with this trader for another month.</p>
+
+<h3 class="mt-3">6. Acquire Passengers</h3>
+
+<p>When arriving at a spaceport, the crew can choose to look for passengers to take on. There are four classes of passengers, Low, Basic, Middle and High, all of which want to travel to specific destinations. To identify which passengers are available for a given destination, the crew should roll for each class of passenger per destination, using the modifiers described on <span class="page">p.239</span>.</p>
+
+<p>First roll an Average (8+) Broker, Carouse or Streetwise check.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("INT or SOC", "newPort.acquirePassengers.characteristic", -3, 3) }}
+  {{ field_number("Broker/Carouse/Streetwise", "newPort.acquirePassengers.skill", -3, 4) }}
+  {{ roll("newPortAcquirePassengersCheckRoll") }}
+</div>
+
+<p>Then input the result of that roll below, alongside the other parameters.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ world_select("Destination", "newPort.acquirePassengers.destination", hexes) }}
+  {{ field_number("Check Result", "newPort.acquirePassengers.checkResult") }}
+  {{ field_number("Chief Steward", "newPort.acquirePassengers.steward", -3, 4) }}
+  {{ field_number("Parsecs after first", "newPort.acquirePassengers.distance", 0) }}
+  {{ field_number("Additional modifier", "newPort.acquirePassengers.additional") }}
+  {{ roll("newPortAcquirePassengersHighRoll") }}
+  {{ roll("newPortAcquirePassengersMiddleRoll") }}
+  {{ roll("newPortAcquirePassengersBasicRoll") }}
+  {{ roll("newPortAcquirePassengersLowRoll") }}
+</div>
+
+<p>Then input the results here to determine how many passengers are actually available for each passenger class:</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("Result", "newPort.acquirePassengers.result") }}
+  {{ roll("newPortAcquirePassengersNumRoll") }}
+</div>
+
+<h3 class="mt-3">7. Acquire Freight</h3>
+
+<p>Freight is a reliable and straightforward way to make a profit from trading. Prices are fixed and paid on delivery. There are three types of lots: Major (<code>!roll 1d6 !Weight of Major lots (x 10 tons)</code>), Minor (<code>!roll 1d6 !Weight of Minor lots (x 5 tons)</code>) and Incidental (<code>!roll 1d6 !Weight of Incidental lots (tons)</code>).</p>
+
+<p>First roll an Average (8+) Broker or Streetwise check.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("INT or SOC", "newPort.acquireFreight.characteristic", -3, 3) }}
+  {{ field_number("Broker/Streetwise", "newPort.acquireFreight.skill", -3, 4) }}
+  {{ roll("newPortAcquireFreightCheckRoll") }}
+</div>
+
+<p>Then input the result of that roll below, alongside the other parameters.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ world_select("Destination", "newPort.acquireFreight.destination", hexes) }}
+  {{ field_number("Check Result", "newPort.acquireFreight.checkResult") }}
+  {{ field_number("Parsecs after first", "newPort.acquireFreight.distance", 0) }}
+  {{ field_number("Additional modifier", "newPort.acquireFreight.additional") }}
+  {{ roll("newPortAcquireFreightMajorRoll") }}
+  {{ roll("newPortAcquireFreightMinorRoll") }}
+  {{ roll("newPortAcquireFreightIncidentalRoll") }}
+</div>
+
+<p>Finally input the results of that roll here to determine how much freight is actually available (repeat for each lot size):</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("Result", "newPort.acquireFreight.result") }}
+  {{ roll("newPortAcquireFreightNumRoll") }}
+</div>
+
+<p>Remember that the weight of each lot also needs to be rolled for.</p>
+
+<h3 class="mt-3">8. Acquire Mail</h3>
+
+<p>Crews can also pick up mail, which is a special type of freight. To determine whether mail is available, specify the freight modifier in the previous step, then fill in the following fields.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_checkbox("Ship is armed", "newPort.acquireMail.shipIsArmed") }}
+  {{ field_number("Highest Naval/Scout rank", "newPort.acquireMail.highestNavalScoutRank", 0, 6) }}
+  {{ field_number("Highest SOC", "newPort.acquireMail.highestSoc", -3, 3) }}
+  {{ roll("newPortAcquireMailRoll", "(12+)") }}
+</div>
+
+<p>Then, determine the number of available containers:</p>
+
+<div class="roll mb-3"><code>!roll 1d6 !Number of mail containers</code></div>
+
+<p>All or none of the containers must be picked up. Mail takes up 5 tons per container, each of which is worth Cr25000 credits on delivery.</p>
+
+<h3 class="mt-3">9. Buy Goods</h3>
+
+<p>Speculative goods can be bought from a seller or broker.</p>
+
+<h4 class="mt-3">9.1. Find a Supplier or a Broker</h4>
+
+<p>You can either attempt to find a supplier or a broker. The latter serves as an intermediary who will negotiate on your behalf in exchange for a cut of the proceeds (see <span class="page">p.241</span>). If you are on a technologically-advanced world, you can perform the search through online networks.</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12"><strong>Find a Supplier or Broker (in person):</strong></div>
+  {{ field_number("EDU or SOC", "newPort.buyGoods.brokerCharacteristic", -3, 3) }}
+  {{ field_number("Broker", "newPort.buyGoods.broker", -3, 4) }}
+  {{ field_number("Previous Attempts this Month", "newPort.buyGoods.previousAttempts", 0) }}
+  {{ roll("newPortBuyGoodsFindBuyerInPersonRoll", "(Average 8+), which takes <code>!roll 1d6 !Time for finding supplier/broker</code> days") }}
+</div>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12"><strong>Find a Supplier or Broker (online, TL8+ only):</strong></div>
+  {{ field_number("EDU", "newPort.buyGoods.brokerCharacteristic", -3, 3) }}
+  {{ field_number("Admin", "newPort.buyGoods.admin", -3, 4) }}
+  {{ field_number("Previous Attempts this Month", "newPort.buyGoods.previousAttempts", 0) }}
+  {{ roll("newPortBuyGoodsFindBuyerOnlineRoll", "(Average 8+), which takes <code>!roll 1d6 !Time for finding supplier/broker</code> hours") }}
+</div>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12"><strong>Find a Black Market Supplier or Broker of Illegal Goods:</strong></div>
+  {{ field_number("EDU or SOC", "newPort.buyGoods.brokerCharacteristic", -3, 3) }}
+  {{ field_number("Streetwise", "newPort.buyGoods.streetwise", -3, 4) }}
+  {{ field_number("Previous Attempts this Month", "newPort.buyGoods.previousAttempts", 0) }}
+  {{ roll("newPortBuyGoodsFindBuyerIllegalRoll", "(Average 8+), which takes <code>!roll 1d6 !Time for finding supplier/broker</code> days") }}
+</div>
+
+<p>If the crew already previously located a supplier, and they are still on the station, it is not necessary to roll to find them again.</p>
+
+<h4 class="mt-3">9.2. Determine goods available</h4>
+
+<p>For any given world, the following goods will be available:</p>
+
+<ul>
+  <li>All Common Goods</li>
+  <li>All Trade Goods that match the world's trade codes</li>
+  <li>A number of randomly-determined Trade Goods equal to the world's Population</li>
+</ul>
+
+<p>Repeat <code>!roll dd66 !Choosing trade good</code> as many times as there is <code>Population</code> to determine which of the latter category of goods are available. Re-roll 61 to 65 unless dealing with a black market supplier.</p>
+
+<p>The quantities of available goods are then determined by rolling the dice in the corresponding columns of the trade goods table on <span class="page">p.244</span>. There is a <code>DM-3</code> modifier on Population 3- worlds, and a <code>DM+3</code> on Population 9+ worlds.</p>
+
+<h4 class="mt-3">9.3. Determine purchase price</h4>
+
+<p>Once the crew has found a supplier, they'll need to negotiate a price for what they're buying. This is done by rolling <code>3D</code> Broker (INT or EDU) and applying relevant DMs (see <span class="page">p.243</span>).</p>
+<p>If employing a local broker, add an extra <code>+2</code> on top of their broker skill (determined with a <code>2D/3</code> roll).</p>
+
+<div class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  {{ field_number("INT or SOC", "newPort.buyGoods.negotiationCharacteristic", -3, 3) }}
+  {{ field_number("Broker", "newPort.buyGoods.broker", -3, 6) }}
+  <div class="col-12">
+    <div class="input-group">
+      <div class="input-group-text">Trade Good</div>
+      <select class="form-select" v-model="newPort.buyGoods.tradeGood">
+        <option v-for="good in tradeGoods" :value="good.id" v-html="good.name"></option>
+      </select>
+    </div>
+  </div>
+  {{ field_number("Opposing Broker", "newPort.buyGoods.opposingBroker", -3, 4) }}
+  {{ roll("newPortBuyGoodsNegotiationRoll") }}
+</div>
+
+<p>If the resultant price is refused, it is not possible to deal with this trader for another month.</p>
+
+<h3 class="mt-3">10. Maintenance and Other Costs</h3>
+<p>Ship need to be maintained once every 4 weeks. Once per year, this needs to be done at a shipyard. Failing to conduct proper maintenance will result in damage to the ship (see <span class="page">p.154</span>).</p>
+<p>The crew will also need to pay berthing costs while their ship is docked. The costs depend on the starport level:</p>
+<ul>
+  <li><strong>Excellent (A):</strong> <code>1D</code> x 1000 CR per week</li>
+  <li><strong>Good (B):</strong> <code>1D</code> x 500 CR per week</li>
+  <li><strong>Routine (C):</strong> <code>1D</code> x 100 CR per week</li>
+  <li><strong>Poor (D):</strong> <code>1D</code> x 10 CR per week</li>
+  <li><strong>Frontier (E):</strong> no berthing cost</li>
+</ul>
+<p>Fuel can also be purchased here, with its quality dependent on the starport quality.</p>
+</div>
+{% endblock %}
